@@ -26,7 +26,7 @@ public class TUDONG extends LinearOpMode {
         private DcMotorEx linerLeft;
         private DcMotorEx linerRight;
 
-        public Lift (HardwareMap hardwareMap) {
+        public Lift(HardwareMap hardwareMap) {
             linerLeft = hardwareMap.get(DcMotorEx.class, "motor");
             linerRight = hardwareMap.get(DcMotorEx.class, "motor");
             linerLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -53,18 +53,48 @@ public class TUDONG extends LinearOpMode {
                 if (pos1 < 1800 && pos2 < 1800) {
                     return true;
                 } else {
-
                     linerLeft.setPower(0);
                     linerRight.setPower(0);
                     return false;
                 }
-
-
             }
         }
+
+        // Hành động hạ xuống (về vị trí 0)
+        public class LiftDown implements Action {
+            private boolean initialized = false;
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                if (!initialized) {
+                    linerRight.setPower(-0.8);
+                    linerLeft.setPower(-0.8);
+                    initialized = true;
+                }
+
+                double pos1 = linerLeft.getCurrentPosition();
+                double pos2 = linerRight.getCurrentPosition();
+
+                if (pos1 > 0 && pos2 > 0) {
+                    return true;
+                } else {
+                    linerLeft.setPower(0);
+                    linerRight.setPower(0);
+                    return false;
+                }
+            }
+        }
+
+        // Trả về hành động nâng lên
         public Action liftUp() {
             return new LiftUp();
         }
+
+        // Trả về hành động hạ xuống
+        public Action liftDown() {
+            return new LiftDown();
+        }
+
     }
 
     public class Claw {
@@ -88,7 +118,7 @@ public class TUDONG extends LinearOpMode {
                 sleep(300);
                 Servo0.setPosition(0.38);
                 Servo1.setPosition(1);
-                Servo2.setPosition(0.6); 
+                Servo2.setPosition(0.6);
                 sleep(500);
                 Servo3.setPosition(0.3);
                 Servo4.setPosition(0.3);
@@ -106,7 +136,8 @@ public class TUDONG extends LinearOpMode {
 
 
                 sleep(200);
-                Servo0.setPosition(0.65);                return false;
+                Servo0.setPosition(0.65);
+                return false;
             }
         }
         public Action openClaw() {
